@@ -3,6 +3,21 @@ from board import Board
 from game_rules import GameRules
 
 class Game:
+    def show_message(self, message):
+        """Displays a win/draw message on the screen."""
+        font = pygame.font.Font(None, 80)  # Choose a font and size
+        text = font.render(message, True, (255, 0, 0))  # Red text
+        text_rect = text.get_rect(center=(self.screen.get_width() // 2, self.screen.get_height() // 2))
+
+        # Draw the text onto the screen
+        self.screen.fill((255, 255, 255))  # Clear screen
+        self.screen.blit(text, text_rect)
+        pygame.display.flip()
+
+        # Pause the game for 2.5 seconds before resetting
+        pygame.time.delay(2500)
+        self.reset_game()
+
     def __init__(self, screen):
         """Initialize the game with board, rules, and game state."""
         self.screen = screen
@@ -63,11 +78,19 @@ class Game:
         if self.board.make_move(row, col, self.current_player):
             winner = self.rules.check_winner()
             if winner:
-                print(f"{winner} WINS!")  # Will replace with visual text later
+                self.show_message(f"{winner} WINS!") #Show winner message
                 self.game_over = True
             elif self.rules.is_draw():
-                print("It's a DRAW!")  # Will replace with visual text later
+                self.show_magges("It's a DRAW!")  #Show draw message
                 self.game_over = True
             else:
                 # Switch turns if the game is still going
                 self.current_player = "O" if self.current_player == "X" else "X"
+    
+
+
+    def reset_game(self):
+        """Resets the game board and state for a new round."""
+        self.board.reset()
+        self.game_over = False
+        self.current_player = "X"
