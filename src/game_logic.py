@@ -1,6 +1,8 @@
 import pygame
 from board import Board
 from game_rules import GameRules
+from ai_logic import AI
+
 
 class Game:
     def show_message(self, message):
@@ -25,6 +27,7 @@ class Game:
         self.rules = GameRules(self.board)
         self.current_player = "X"
         self.game_over = False
+        self.ai = AI("O", "X", self.board) #AI is 'O', Player is 'X'
 
     def draw_board(self):
         """Draws the Tic-Tac-Toe grid and pieces."""
@@ -67,26 +70,39 @@ class Game:
         pygame.draw.circle(self.screen, (0, 0, 0), (center_x, center_y), radius, 10)
 
     def handle_click(self, pos):
-        """Handles a mouse click by placing an X or O."""
+        """Handles a mouse click by placing an X or O and lets AI respond."""
         if self.game_over:
             return  # Ignore clicks after game over
 
-        cell_size = self.screen.get_width() // 3
-        col = pos[0] // cell_size
-        row = pos[1] // cell_size
+        col = pos[0] // (self.screen.get_width() // 3)
+        row = pos[1] // (self.screen.get_height() // 3)
 
+        # Player move
         if self.board.make_move(row, col, self.current_player):
             winner = self.rules.check_winner()
             if winner:
-                self.show_message(f"{winner} WINS!") #Show winner message
+                self.show_message(f"{winner} WINS!")
+                self.game_over = True
+                return
+            elif self.rules.is_draw():
+                self.show_message("It's a DRAW!")
+                self.game_over = True
+                return
+
+            # AI move
+            ai_move = self.ai.get_best_move()
+            if ai_move:
+                self.board.make_move(ai_move[0], ai_move[1], "O")
+
+            # Check game status after AI move
+            winner = self.rules.check_winner()
+            if winner:
+                self.show_message(f"{winner} WINS!")
                 self.game_over = True
             elif self.rules.is_draw():
-                self.show_magges("It's a DRAW!")  #Show draw message
+                self.show_message("It's a DRAW!")
                 self.game_over = True
-            else:
-                # Switch turns if the game is still going
-                self.current_player = "O" if self.current_player == "X" else "X"
-    
+
 
 
     def reset_game(self):
