@@ -1,3 +1,4 @@
+import random
 class Board:
     def __init__(self):
         """Initialize an empty 3x3 Tic-Tac-Toe board."""
@@ -21,7 +22,30 @@ class Board:
             self.grid[row][col] = player_symbol
             return True
         return False
+    def swap_random_pieces(self):
+        """Swaps two random pieces on the board."""
+        flat_grid = [(r, c) for r in range(3) for c in range(3) if self.grid[r][c] != " "]
+        if len(flat_grid) >= 2:
+            (r1, c1), (r2, c2) = random.sample(flat_grid, 2)
+            self.grid[r1][c1], self.grid[r2][c2] = self.grid[r2][c2], self.grid[r1][c1]
 
+    def shift_board(self):
+        """Shifts the entire board one row/column randomly."""
+        direction = random.choice(["up", "down", "left", "right"])
+        new_grid = [[" " for _ in range(3)] for _ in range(3)]
+
+        if direction == "up":
+            new_grid[0], new_grid[1], new_grid[2] = self.grid[1], self.grid[2], [" ", " ", " "]
+        elif direction == "down":
+            new_grid[0], new_grid[1], new_grid[2] = [" ", " ", " "], self.grid[0], self.grid[1]
+        elif direction == "left":
+            for r in range(3):
+                new_grid[r] = self.grid[r][1:] + [" "]
+        elif direction == "right":
+            for r in range(3):
+                new_grid[r] = [" "] + self.grid[r][:2]
+
+        self.grid = new_grid  # Apply the shifted board
     def reset(self):
         """Clears the board."""
         self.grid = [[" " for _ in range(3)] for _ in range(3)]

@@ -28,6 +28,9 @@ class Game:
         self.current_player = "X"
         self.game_over = False
         self.ai = AI("O", "X", self.board) #AI is 'O', Player is 'X'
+        self.draw_streak = 0  # Tracks consecutive draws
+        self.glitches_active = False  # Tracks if AI has started glitching
+
 
     def draw_board(self):
         """Draws the Tic-Tac-Toe grid and pieces."""
@@ -85,8 +88,13 @@ class Game:
                 self.game_over = True
                 return
             elif self.rules.is_draw():
-                self.show_message("It's a DRAW!")
-                self.game_over = True
+                self.draw_streak +=1 # Increase draw count
+                if self.draw_streak >= 2 and not self.glitches_active:
+                    self.glitches_active = True  #AI starts glitching
+                    self.activate_glitches()
+                else:
+                    self.show_message("It's a DRAW!")
+                    self.game_over = False 
                 return
 
             # AI move
@@ -104,6 +112,21 @@ class Game:
                 self.game_over = True
 
 
+    def activate_glitches(self):
+        """Triggers game distortions when AI 'gets frustrated'."""
+        self.glitches_active = True
+        self.show_message("WARNING: Reality Distorting...")  
+
+        # Introduce one or more game twists:
+        self.board.swap_random_pieces()  # AI swaps some pieces
+        self.board.shift_board()  # Board shifts slightly
+        self.add_power_ups()  # Player gains special abilities
+
+        self.draw_streak = 0  # Reset draw count
+
+    def add_power_ups(self):
+        """Placeholder for future power-up mechanics."""
+        print("🔧 Power-ups coming soon!")
 
     def reset_game(self):
         """Resets the game board and state for a new round."""
