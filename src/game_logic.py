@@ -6,8 +6,43 @@ from ai_logic import AI
 
 class Game:
     def show_message(self, message):
+        """Displays a win/draw message on the screen with text wrapping."""
+        font = pygame.font.Font(None, 40)  # Adjusted font size for better fit
+        max_width = self.screen.get_width() - 40  # Leave some padding on the sides
+
+        # Split text into multiple lines if it's too long
+        words = message.split(" ")
+        lines = []
+        current_line = ""
+
+        for word in words:
+            test_line = current_line + word + " "
+            test_width, _ = font.size(test_line)
+            if test_width > max_width:
+                lines.append(current_line)
+                current_line = word + " "
+            else:
+                current_line = test_line
+
+        lines.append(current_line)  # Add the last line
+
+        # Clear the screen before displaying the message
+        self.screen.fill((255, 255, 255))
+
+        # Calculate positioning for text so it's centered
+        y_offset = self.screen.get_height() // 2 - (len(lines) * 20)  
+        for line in lines:
+            text = font.render(line, True, (255, 0, 0))  # Render line in red
+            text_rect = text.get_rect(center=(self.screen.get_width() // 2, y_offset))
+            self.screen.blit(text, text_rect)
+            y_offset += 50  # Space out lines
+
+        pygame.display.flip()
+        pygame.time.delay(2500)  # Pause so player can read
+        self.reset_game()  # Reset game after message displays
+
         """Displays a win/draw message on the screen."""
-        font = pygame.font.Font(None, 80)  # Choose a font and size
+        font = pygame.font.Font(None, 40)  # Choose a font and size
         text = font.render(message, True, (255, 0, 0))  # Red text
         text_rect = text.get_rect(center=(self.screen.get_width() // 2, self.screen.get_height() // 2))
 
