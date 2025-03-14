@@ -1,6 +1,6 @@
 import pygame
 from board import Board
-from ai_logic import AI
+from ai_base import AIBase  # Import AIBase instead of AI
 from game_rules import GameRules
 from effects import show_message
 from glitch_manager import activate_glitches
@@ -19,9 +19,8 @@ class Game:
         self.game_over = False
         self.draw_streak = 0
         self.glitches_active = False
-        self.ai = AI(self.ai_symbol, self.player_symbol, self.board)
+        self.ai = AIBase(self.ai_symbol, self.player_symbol, self.board)  #  Fix AI initialization
 
     def process_click(self, pos):
         """Redirects click handling to the input handler."""
-        handle_click(self, pos)
-    
+        process_turn(self, pos)  #  Ensure correct function call
