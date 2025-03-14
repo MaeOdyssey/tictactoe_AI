@@ -1,170 +1,26 @@
 import pygame
 from board import Board
-from game_rules import GameRules
 from ai_logic import AI
-
+from game_rules import GameRules
+from effects import show_message
+from glitch_manager import activate_glitches
+from game_manager import prepare_new_game
+from input_handler import handle_click
 
 class Game:
-    def show_message(self, message):
-        """Displays a win/draw message on the screen with text wrapping."""
-        font = pygame.font.Font(None, 40)  # Adjusted font size for better fit
-        max_width = self.screen.get_width() - 40  # Leave some padding on the sides
-
-        # Split text into multiple lines if it's too long
-        words = message.split(" ")
-        lines = []
-        current_line = ""
-
-        for word in words:
-            test_line = current_line + word + " "
-            test_width, _ = font.size(test_line)
-            if test_width > max_width:
-                lines.append(current_line)
-                current_line = word + " "
-            else:
-                current_line = test_line
-
-        lines.append(current_line)  # Add the last line
-
-        # Clear the screen before displaying the message
-        self.screen.fill((255, 255, 255))
-
-        # Calculate positioning for text so it's centered
-        y_offset = self.screen.get_height() // 2 - (len(lines) * 20)  
-        for line in lines:
-            text = font.render(line, True, (255, 0, 0))  # Render line in red
-            text_rect = text.get_rect(center=(self.screen.get_width() // 2, y_offset))
-            self.screen.blit(text, text_rect)
-            y_offset += 50  # Space out lines
-
-        pygame.display.flip()
-        pygame.time.delay(2500)  # Pause so player can read
-        self.reset_game()  # Reset game after message displays
-
-        """Displays a win/draw message on the screen."""
-        font = pygame.font.Font(None, 40)  # Choose a font and size
-        text = font.render(message, True, (255, 0, 0))  # Red text
-        text_rect = text.get_rect(center=(self.screen.get_width() // 2, self.screen.get_height() // 2))
-
-        # Draw the text onto the screen
-        self.screen.fill((255, 255, 255))  # Clear screen
-        self.screen.blit(text, text_rect)
-        pygame.display.flip()
-
-        # Pause the game for 2.5 seconds before resetting
-        pygame.time.delay(2500)
-        self.reset_game()
-
     def __init__(self, screen):
-        """Initialize the game with board, rules, and game state."""
+        """Initialize the game with board, rules, and AI."""
         self.screen = screen
         self.board = Board()
         self.rules = GameRules(self.board)
         self.current_player = "X"
+        self.ai_symbol = "O"
+        self.player_symbol = "X"
         self.game_over = False
-        self.ai = AI("O", "X", self.board) #AI is 'O', Player is 'X'
-        self.draw_streak = 0  # Tracks consecutive draws
-        self.glitches_active = False  # Tracks if AI has started glitching
+        self.draw_streak = 0
+        self.glitches_active = False
+        self.ai = AI(self.ai_symbol, self.player_symbol, self.board)
 
-
-    def draw_board(self):
-        """Draws the Tic-Tac-Toe grid and pieces."""
-        self.screen.fill((255, 255, 255))  # White background
-        line_color = (200, 200, 200)
-        cell_size = self.screen.get_width() // 3
-
-        # Draw grid lines
-        pygame.draw.line(self.screen, line_color, (cell_size, 0), (cell_size, self.screen.get_height()), 10)
-        pygame.draw.line(self.screen, line_color, (cell_size * 2, 0), (cell_size * 2, self.screen.get_height()), 10)
-        pygame.draw.line(self.screen, line_color, (0, cell_size), (self.screen.get_width(), cell_size), 10)
-        pygame.draw.line(self.screen, line_color, (0, cell_size * 2), (self.screen.get_width(), cell_size * 2), 10)
-
-        # Draw X’s and O’s
-        for row in range(3):
-            for col in range(3):
-                if self.board.grid[row][col] == "X":
-                    self.draw_x(row, col)
-                elif self.board.grid[row][col] == "O":
-                    self.draw_o(row, col)
-
-    def draw_x(self, row, col):
-        """Draws an X in the given row and column."""
-        padding = 40
-        cell_size = self.screen.get_width() // 3
-        start_x = col * cell_size + padding
-        start_y = row * cell_size + padding
-        end_x = (col + 1) * cell_size - padding
-        end_y = (row + 1) * cell_size - padding
-
-        pygame.draw.line(self.screen, (0, 0, 0), (start_x, start_y), (end_x, end_y), 10)
-        pygame.draw.line(self.screen, (0, 0, 0), (start_x, end_y), (end_x, start_y), 10)
-
-    def draw_o(self, row, col):
-        """Draws an O in the given row and column."""
-        cell_size = self.screen.get_width() // 3
-        center_x = col * cell_size + cell_size // 2
-        center_y = row * cell_size + cell_size // 2
-        radius = cell_size // 3
-        pygame.draw.circle(self.screen, (0, 0, 0), (center_x, center_y), radius, 10)
-
-    def handle_click(self, pos):
-        """Handles a mouse click by placing an X or O and lets AI respond."""
-        if self.game_over:
-            return  # Ignore clicks after game over
-
-        col = pos[0] // (self.screen.get_width() // 3)
-        row = pos[1] // (self.screen.get_height() // 3)
-
-        # Player move
-        if self.board.make_move(row, col, self.current_player):
-            winner = self.rules.check_winner()
-            if winner:
-                self.show_message(f"{winner} WINS!")
-                self.game_over = True
-                return
-            elif self.rules.is_draw():
-                self.draw_streak +=1 # Increase draw count
-                if self.draw_streak >= 2 and not self.glitches_active:
-                    self.glitches_active = True  #AI starts glitching
-                    self.activate_glitches()
-                else:
-                    self.show_message("It's a DRAW!")
-                    self.game_over = False 
-                return
-
-            # AI move
-            ai_move = self.ai.get_best_move()
-            if ai_move:
-                self.board.make_move(ai_move[0], ai_move[1], "O")
-
-            # Check game status after AI move
-            winner = self.rules.check_winner()
-            if winner:
-                self.show_message(f"{winner} WINS!")
-                self.game_over = True
-            elif self.rules.is_draw():
-                self.show_message("It's a DRAW!")
-                self.game_over = True
-
-
-    def activate_glitches(self):
-        """Triggers game distortions when AI 'gets frustrated'."""
-        self.glitches_active = True
-        self.show_message("WARNING: Reality Distorting...")  
-
-        # Introduce one or more game twists:
-        self.board.swap_random_pieces()  # AI swaps some pieces
-        self.board.shift_board()  # Board shifts slightly
-        self.add_power_ups()  # Player gains special abilities
-
-        self.draw_streak = 0  # Reset draw count
-
-    def add_power_ups(self):
-        """Placeholder for future power-up mechanics."""
-        print("🔧 Power-ups coming soon!")
-
-    def reset_game(self):
-        """Resets the game board and state for a new round."""
-        self.board.reset()
-        self.game_over = False
-        self.current_player = "X"
+    def process_click(self, pos):
+        """Redirects click handling to the input handler."""
+        handle_click(self, pos)

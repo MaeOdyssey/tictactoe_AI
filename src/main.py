@@ -1,28 +1,28 @@
 import pygame
 from game_logic import Game
+from graphics import draw_board
+from input_handler import handle_click
 
 # Initialize Pygame
 pygame.init()
+screen = pygame.display.set_mode((600, 600))
+pygame.display.set_caption("AI-Powered Tic-Tac-Toe")
 
-# Screen settings
-WIDTH, HEIGHT = 600, 600
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Tic-Tac-Toe")
-
-# Initialize the game
+# Create Game Object
 game = Game(screen)
 
-# Game loop
 running = True
 while running:
+    screen.fill((200, 200, 200))  # Grey background
+    draw_board(screen)  # Draw the board
+    game.board.draw_pieces(screen)  # Draw Xs and Os
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            game.handle_click(event.pos)
+            handle_click(game, event.pos)  # Process clicks
 
-    game.draw_board()  # Draw the game board
-    pygame.display.flip()  # Refresh the screen
+    pygame.display.flip()  # Update screen
 
-# Quit Pygame
 pygame.quit()

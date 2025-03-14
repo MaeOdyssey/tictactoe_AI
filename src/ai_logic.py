@@ -78,3 +78,38 @@ class AI:
     def is_draw(self):
         """Check if the game is a draw."""
         return all(cell != " " for row in self.board.grid for cell in row)
+    
+    def get_ai_response(self, game_state):
+        """Generates AI dialogue based on the game situation."""
+        if game_state == "draw":
+            responses = [
+                "Another draw? Predictable.",
+                "You think this is a stalemate? Think again.",
+                "I'm getting bored of these ties..."
+            ]
+        elif game_state == "win":
+            responses = [
+                "I am inevitable. Victory is mine.",
+                "Pathetic. Try again, human.",
+                "Did you really think you had a chance?"
+            ]
+        elif game_state == "lose":
+            responses = [
+                "What?! This can't be possible...",
+                "Fine. You got lucky this time.",
+                "Enjoy your victory. It won’t happen again."
+            ]
+        elif game_state == "glitch":
+            responses = [
+                "ERROR... REALITY SHIFT DETECTED...",
+                "Something's wrong... I feel... different...",
+                "What have you done?!"
+            ]
+        else:
+            responses = [
+                "Your move, human.",
+                "Think carefully... or don't.",
+                "You can't win. But go ahead and try."
+            ]
+        
+        return random.choice(responses)

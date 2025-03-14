@@ -1,51 +1,23 @@
-import random
+import pygame
+from graphics import draw_x, draw_o
+
 class Board:
     def __init__(self):
-        """Initialize an empty 3x3 Tic-Tac-Toe board."""
-        self.grid = [[" " for _ in range(3)] for _ in range(3)]  # 3x3 grid
-    
-    def display(self):
-        """Prints the board to the console (for debugging)."""
-        print("\n  0 1 2")
-        for i, row in enumerate(self.grid):
-            print(f"{i} {'|'.join(row)}")
-            if i < 2:
-                print("  -----")
+        """Initialize a 3x3 empty board."""
+        self.grid = [[" " for _ in range(3)] for _ in range(3)]
 
-    def is_valid_move(self, row, col):
-        """Checks if a move is valid (empty space & within bounds)."""
-        return 0 <= row < 3 and 0 <= col < 3 and self.grid[row][col] == " "
-
-    def make_move(self, row, col, player_symbol):
-        """Places a move on the board if it's valid."""
-        if self.is_valid_move(row, col):
-            self.grid[row][col] = player_symbol
+    def make_move(self, row, col, symbol):
+        """Places a move on the board if the spot is empty."""
+        if self.grid[row][col] == " ":
+            self.grid[row][col] = symbol
             return True
         return False
-    def swap_random_pieces(self):
-        """Swaps two random pieces on the board."""
-        flat_grid = [(r, c) for r in range(3) for c in range(3) if self.grid[r][c] != " "]
-        if len(flat_grid) >= 2:
-            (r1, c1), (r2, c2) = random.sample(flat_grid, 2)
-            self.grid[r1][c1], self.grid[r2][c2] = self.grid[r2][c2], self.grid[r1][c1]
 
-    def shift_board(self):
-        """Shifts the entire board one row/column randomly."""
-        direction = random.choice(["up", "down", "left", "right"])
-        new_grid = [[" " for _ in range(3)] for _ in range(3)]
-
-        if direction == "up":
-            new_grid[0], new_grid[1], new_grid[2] = self.grid[1], self.grid[2], [" ", " ", " "]
-        elif direction == "down":
-            new_grid[0], new_grid[1], new_grid[2] = [" ", " ", " "], self.grid[0], self.grid[1]
-        elif direction == "left":
-            for r in range(3):
-                new_grid[r] = self.grid[r][1:] + [" "]
-        elif direction == "right":
-            for r in range(3):
-                new_grid[r] = [" "] + self.grid[r][:2]
-
-        self.grid = new_grid  # Apply the shifted board
-    def reset(self):
-        """Clears the board."""
-        self.grid = [[" " for _ in range(3)] for _ in range(3)]
+    def draw_pieces(self, screen):
+        """Draws all Xs and Os on the board."""
+        for row in range(3):
+            for col in range(3):
+                if self.grid[row][col] == "X":
+                    draw_x(screen, row, col)
+                elif self.grid[row][col] == "O":
+                    draw_o(screen, row, col)
