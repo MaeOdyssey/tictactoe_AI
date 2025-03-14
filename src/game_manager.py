@@ -1,11 +1,19 @@
 from board import Board
+from ai_logic import AI  
 
 def prepare_new_game(game):
     """Resets the game properly after a win/draw."""
-    print("DEBUG: Resetting board and clearing game state...")  # ✅ Add debug to check if reset is working
+    print("DEBUG: Resetting board and clearing game state...")  
     game.board = Board()  # Reset board
-    game.rules.board = game.board  # ✅ Ensure rules are also pointing to the new board
-    game.current_player = "X"  # Ensure the player starts first
-    game.game_over = False  # ✅ Allow clicks again
-    game.draw_streak = 0  # Reset draw count
-    game.glitches_active = False  # Reset glitch state
+    game.rules.board = game.board  
+    game.ai = AI(game.ai_symbol, game.player_symbol, game.board)
+
+    game.current_player = "X"  
+    game.game_over = False  
+    game.draw_streak = 0  
+    game.glitches_active = False  
+
+    print(f"DEBUG: AI reinitialized. AI Symbol: {game.ai_symbol}, Player Symbol: {game.player_symbol}")
+
+    # ✅ Force the screen to visually update immediately
+    game.board.render(game.screen)  

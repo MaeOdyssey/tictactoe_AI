@@ -1,6 +1,7 @@
 import pygame
 from game_logic import Game
 from graphics import draw_board
+from graphics import draw_pieces
 from input_handler import handle_click
 
 # Initialize Pygame
@@ -15,7 +16,7 @@ running = True
 while running:
     screen.fill((200, 200, 200))  # Grey background
     draw_board(screen)  # Draw the board
-    game.board.draw_pieces(screen)  # Draw Xs and Os
+    draw_pieces(game.screen, game.board.grid) #Draw Xs and Os
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

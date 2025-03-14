@@ -15,6 +15,15 @@ def draw_board(screen):
     pygame.draw.line(screen, (0, 0, 0), (0, third_h), (width, third_h), 5)
     pygame.draw.line(screen, (0, 0, 0), (0, 2 * third_h), (width, 2 * third_h), 5)
 
+def draw_pieces(screen, grid):
+    """Draws Xs and Os based on the board state."""
+    for row in range(3):
+        for col in range(3):
+            if grid[row][col] == "X":
+                draw_x(screen, row, col)
+            elif grid[row][col] == "O":
+                draw_o(screen, row, col)
+
 def draw_x(screen, row, col):
     """Draws an 'X' in the given board cell."""
     x, y = col * 200 + 100, row * 200 + 100
