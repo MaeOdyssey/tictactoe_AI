@@ -1,4 +1,5 @@
 import pygame
+from glitch_manager import shift_board
 from graphics import draw_board, draw_pieces  
 
 class Board:
@@ -13,8 +14,9 @@ class Board:
         pygame.display.flip()  # Ensure the screen updates
 
     def make_move(self, row, col, symbol):
-        """Places a move on the board if the cell is empty."""
+        """Places a move on the board if the cell is empty and updates UI."""
         if self.grid[row][col] == " ":
             self.grid[row][col] = symbol
             return True  # Move was successful
         return False  # Move was invalid
+

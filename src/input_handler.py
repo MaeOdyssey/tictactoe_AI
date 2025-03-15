@@ -11,6 +11,6 @@ def handle_click(game, pos):
 
     row, col = pos[1] // 200, pos[0] // 200
 
-    if process_turn(game, row, col):  # Uses new turn handler
+    if process_turn(game, pos):  # Uses new turn handler
         print("DEBUG: Game ended, preparing new game...")
         prepare_new_game(game)  

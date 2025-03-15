@@ -19,8 +19,12 @@ class Game:
         self.game_over = False
         self.draw_streak = 0
         self.glitches_active = False
-        self.ai = AIBase(self.ai_symbol, self.player_symbol, self.board)  #  Fix AI initialization
+        self.ai_wins = 0
+        self.player_wins = 0
+        self.total_turns = 0
+        self.ai = AIBase(self.ai_symbol, self.player_symbol, self.board)  # Initialize AI with correct symbols
 
     def process_click(self, pos):
-        """Redirects click handling to the input handler."""
-        process_turn(self, pos)  #  Ensure correct function call
+        """Redirects click handling to the input handler and updates UI."""
+        process_turn(self, pos)  # Process player move and AI response
+        self.board.render(self.screen)  # Ensure the board updates after a move
